@@ -5,6 +5,7 @@ sys.path.append(os.getcwd())
 import logging
 import pygame
 import argparse
+from random import randint
 from pygame.locals import *
 from thin_client.session import GameSession
 from thin_client import settings
@@ -19,7 +20,17 @@ class Action:
     def process(self, event):
         """Do Nothing by default"""
         pass
+    
+class MouseMotionRandom(Action):
+    def process(self, event):
+        """Processes mouse motion events and sends it to the pack_and_send method"""
+        self.session.pack_and_send(settings.DEVICE_MOUSE, randint(-15,15), randint(-15,15), event.type)
 
+class MouseMotionRandom1(Action):
+    def process(self, event):
+        """Processes mouse motion events and sends it to the pack_and_send method"""
+        self.session.pack_and_send(settings.DEVICE_MOUSE, randint(-10,5), randint(-5,5), event.type)
+        
 class MouseButton(Action):
     def process(self, event):
         """Processes mouse button events and sends it to the pack_and_send method"""
@@ -148,6 +159,8 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     scale, offset, is_width_smaller, capture_object = stream_reader.setup_stream(ip, port)
     is_running = True
     is_mouse_grabbed = True
+    
+    counter = -500
 
     while (is_running):
         image_frame = stream_reader.get_frame(capture_object, scale)
@@ -157,16 +170,35 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
         if (image_frame == False):
             show_message(screen, settings.TEXT_SERVER_DISCONNECTED, settings.TEXT_RESTART_CLIENT)
             action = Action(session, pygame)
+            
         else:
-            if (event.type == KEYDOWN or event.type == KEYUP):
+            if (player_controller_id == 0):
+                action = MouseMotionRandom(session, pygame)
+            elif (player_controller_id == 1):
+                action = MouseMotionRandom(session, pygame)
+            elif (player_controller_id == 2):
+                action = MouseMotionRandom(session, pygame)
+            elif (player_controller_id == 3):
+                action = MouseMotionRandom1(session, pygame)
+            elif (player_controller_id == 4):
+                action = MouseMotionRandom1(session, pygame)
+            elif (player_controller_id == 5):
+                action = MouseMotionRandom1(session, pygame)
+            else:
+                action = MouseMotionRandom(session, pygame)
+
+            '''
+            elif (event.type == KEYDOWN or event.type == KEYUP):
                 action = KeyboardButton(session, pygame)                    
             elif (event.type == pygame.MOUSEMOTION):
                 action = MouseMotion(session, pygame)
             elif (event.type == MOUSEBUTTONDOWN or event.type == MOUSEBUTTONUP):
                 action = MouseButton(session, pygame)
-            else:
-                action = Action(session, pygame)
-
+            '''
+            
+            
+            #if (player_controller_id == 0):
+                
             # Display the frame on the pygame window
             if (is_width_smaller):
                 screen.blit(image_frame, (0, offset))
