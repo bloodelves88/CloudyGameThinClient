@@ -194,11 +194,11 @@ if __name__ == '__main__':
     parser.add_argument('ip', metavar='ip', type=str, default="127.0.0.1",
                         help="IP address to obtain video stream from")
     parser.add_argument('port', metavar='port', type=int, default=30000,
-                        choices=range(30000, 30004),
-                        help="Port of the IP address you are connecting to. Value from 30000 to 30003")
+                        choices=range(30000, 30006),
+                        help="Port of the IP address you are connecting to. Value from 30000 to 30005")
     parser.add_argument('player', metavar='player', type=int, default=0,
-                        choices=range(0, 4),
-                        help="Player controller ID of the player. Value from 0 to 3.")
+                        choices=range(0, 6),
+                        help="Player controller ID of the player. Value from 0 to 5.")
     parser.add_argument('--session', metavar='session', type=int, default=1,
                         help="ID of the current game session being used.")
 
