@@ -3,7 +3,7 @@ import argparse
 import subprocess
 
 def main(num_players, ip, *args, **kwargs):  
-    for x in range(0, num_players+1):
+    for x in range(0, num_players):
         port = 30000 + x
         command = "python main.py {} {} {}".format(ip, port, x)
         subprocess.Popen(command)
