@@ -32,6 +32,88 @@ class MouseMotionRandom1(Action):
         """Processes mouse motion events and sends it to the pack_and_send method"""
         self.session.pack_and_send(settings.DEVICE_MOUSE, randint(-10,5), randint(-5,5), event.type)
         
+class MouseMotionXLeft(Action):
+    def process(self, event):
+        """Processes mouse motion events and sends it to the pack_and_send method"""
+        self.session.pack_and_send(settings.DEVICE_MOUSE, -5, 0, event.type)
+        
+class MouseMotionXRight(Action):
+    def process(self, event):
+        """Processes mouse motion events and sends it to the pack_and_send method"""
+        self.session.pack_and_send(settings.DEVICE_MOUSE, 5, 0, event.type)
+        
+class KeyboardButtonWDown(Action):
+    def process(self, event):
+        """Processes keyboard button events and sends it to the pack_and_send method"""
+        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(273, 0)
+        ue_char_code = settings.ASCII_TO_UE_CHARCODE.get(273, ue_key_code)
+        ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
+            ue_key_code, ue_char_code, KEYDOWN)
+        
+class KeyboardButtonWUp(Action):
+    def process(self, event):
+        """Processes keyboard button events and sends it to the pack_and_send method"""
+        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(273, 0)
+        ue_char_code = settings.ASCII_TO_UE_CHARCODE.get(273, ue_key_code)
+        ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
+            ue_key_code, ue_char_code, KEYUP)
+        
+class KeyboardButtonSDown(Action):
+    def process(self, event):
+        """Processes keyboard button events and sends it to the pack_and_send method"""
+        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(274, 0)
+        ue_char_code = settings.ASCII_TO_UE_CHARCODE.get(274, ue_key_code)
+        ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
+            ue_key_code, ue_char_code, KEYDOWN)
+        
+class KeyboardButtonSUp(Action):
+    def process(self, event):
+        """Processes keyboard button events and sends it to the pack_and_send method"""
+        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(274, 0)
+        ue_char_code = settings.ASCII_TO_UE_CHARCODE.get(274, ue_key_code)
+        ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
+            ue_key_code, ue_char_code, KEYUP)
+        
+class KeyboardButtonDDown(Action):
+    def process(self, event):
+        """Processes keyboard button events and sends it to the pack_and_send method"""
+        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(275, 0)
+        ue_char_code = settings.ASCII_TO_UE_CHARCODE.get(275, ue_key_code)
+        ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
+            ue_key_code, ue_char_code, KEYDOWN)
+        
+class KeyboardButtonDUp(Action):
+    def process(self, event):
+        """Processes keyboard button events and sends it to the pack_and_send method"""
+        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(275, 0)
+        ue_char_code = settings.ASCII_TO_UE_CHARCODE.get(275, ue_key_code)
+        ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
+            ue_key_code, ue_char_code, KEYUP)
+        
+class KeyboardButtonADown(Action):
+    def process(self, event):
+        """Processes keyboard button events and sends it to the pack_and_send method"""
+        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(276, 0)
+        ue_char_code = settings.ASCII_TO_UE_CHARCODE.get(276, ue_key_code)
+        ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
+            ue_key_code, ue_char_code, KEYDOWN)
+        
+class KeyboardButtonAUp(Action):
+    def process(self, event):
+        """Processes keyboard button events and sends it to the pack_and_send method"""
+        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(276, 0)
+        ue_char_code = settings.ASCII_TO_UE_CHARCODE.get(276, ue_key_code)
+        ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
+            ue_key_code, ue_char_code, KEYUP)
+        
 class MouseButton(Action):
     def process(self, event):
         """Processes mouse button events and sends it to the pack_and_send method"""
@@ -159,6 +241,10 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     scale, offset, is_width_smaller, capture_object = stream_reader.setup_stream(ip, port)
     is_running = True
     is_mouse_grabbed = True
+    
+    counter1 = 0
+    counter2 = 0
+    counter3 = 0
 
     while (is_running):
         image_frame = stream_reader.get_frame(capture_object, scale)
@@ -171,15 +257,42 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
             
         else:
             if (player_controller_id == 0):
-                action = MouseMotionRandom(session, pygame)
+                if (counter1 == 100):
+                    action = KeyboardButtonSUp(session, pygame)
+                    counter1 = 0
+                elif (counter1 < 50):
+                    action = KeyboardButtonWDown(session, pygame)
+                elif (counter1 == 50):
+                    action = KeyboardButtonWUp(session, pygame)
+                elif (counter1 > 50):
+                    action = KeyboardButtonSDown(session, pygame)
+                counter1 += 1
             elif (player_controller_id == 1):
-                action = MouseMotionRandom(session, pygame)
+                if (counter2 == 100):
+                    action = KeyboardButtonDUp(session, pygame)
+                    counter2 = 0
+                elif (counter2 < 50):
+                    action = KeyboardButtonADown(session, pygame)
+                elif (counter2 == 50):
+                    action = KeyboardButtonAUp(session, pygame)
+                elif (counter2 > 50):
+                    action = KeyboardButtonDDown(session, pygame)
+                counter2 += 1
             elif (player_controller_id == 2):
-                action = MouseMotionRandom(session, pygame)
+                action = MouseMotionXLeft(session, pygame)
             elif (player_controller_id == 3):
-                action = MouseMotionRandom1(session, pygame)
+                action = MouseMotionXRight(session, pygame)
             elif (player_controller_id == 4):
-                action = MouseMotionRandom1(session, pygame)
+                if (counter3 == 100):
+                    action = KeyboardButtonSUp(session, pygame)
+                    counter3 = 0
+                elif (counter3 < 50):
+                    action = KeyboardButtonWDown(session, pygame)
+                elif (counter3 == 50):
+                    action = KeyboardButtonWUp(session, pygame)
+                elif (counter3 > 50):
+                    action = KeyboardButtonSDown(session, pygame)
+                counter3 += 1
             elif (player_controller_id == 5):
                 action = MouseMotionRandom1(session, pygame)
             else:
