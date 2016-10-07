@@ -217,6 +217,8 @@ def main(ip, port, player_controller_id, session_id, game_id, username, *args, *
     session = GameSession(ip, player_controller_id)
     session.send_join_command(ip, port, player_controller_id, session_id, game_id, username)
     
+    print("Thin client starting with ip {}, port {}, player controller id {}".format(ip, port, player_controller_id))
+    
     time.sleep(5) # Give ffmpeg some time to start up and start streaming
     start_client(ip, port, int(player_controller_id), *args, **kwargs)
 
