@@ -5,6 +5,7 @@ sys.path.append(os.getcwd())
 import logging
 import pygame
 import argparse
+import time
 from random import randint
 from pygame.locals import *
 from thin_client.session import GameSession
@@ -76,8 +77,7 @@ class QuitAction(Action):
     def process(self, event):
         """Call the send_quit_command method when the user closes the thin client"""
         self.session.send_quit_command()
-
-
+        
 def initialize_pygame(fps):
     """Initialize pygame with the window size, mouse settings, etc.
     
@@ -159,8 +159,6 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     scale, offset, is_width_smaller, capture_object = stream_reader.setup_stream(ip, port)
     is_running = True
     is_mouse_grabbed = True
-    
-    counter = -500
 
     while (is_running):
         image_frame = stream_reader.get_frame(capture_object, scale)
@@ -195,9 +193,6 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
             elif (event.type == MOUSEBUTTONDOWN or event.type == MOUSEBUTTONUP):
                 action = MouseButton(session, pygame)
             '''
-            
-            
-            #if (player_controller_id == 0):
                 
             # Display the frame on the pygame window
             if (is_width_smaller):
@@ -218,7 +213,11 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
 
     pygame.quit()
 
-def main(ip, port, player_controller_id, *args, **kwargs):
+def main(ip, port, player_controller_id, session_id, game_id, username, *args, **kwargs):
+    session = GameSession(ip, player_controller_id)
+    session.send_join_command(ip, port, player_controller_id, session_id, game_id, username)
+    
+    time.sleep(5) # Give ffmpeg some time to start up and start streaming
     start_client(ip, port, int(player_controller_id), *args, **kwargs)
 
 if __name__ == '__main__':
@@ -233,6 +232,10 @@ if __name__ == '__main__':
                         help="Player controller ID of the player. Value from 0 to 5.")
     parser.add_argument('--session', metavar='session', type=int, default=1,
                         help="ID of the current game session being used.")
+    parser.add_argument('--gameid', metavar='gameid', type=int, default=1,
+                        help="ID of the current game being played.")
+    parser.add_argument('--username', metavar='username', type=str, default="dummy",
+                        help="Username of the player playing.")
 
     args = parser.parse_args()
-    main(args.ip, args.port, args.player, args.session)
+    main(args.ip, args.port, args.player, args.session, args.gameid, args.username)
