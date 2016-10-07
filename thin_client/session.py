@@ -65,3 +65,23 @@ class GameSession(object):
             logging.warning(os.strerror(error.errno));
         finally:
             tcp_socket.close()
+            
+    def send_join_command(self, ip, port, player_controller_id, session_id, game_id, username):
+        json_data = {
+           "command" : "join",
+           "controller" : player_controller_id,
+           "streaming_port" : port,
+           "streaming_ip" : ip,
+           "game_id" : game_id,
+           "username" : username, 
+           "game_session_id" : session_id,
+        }
+        join_command = json.dumps(json_data)
+        try:
+            tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            tcp_socket.connect((self.ip_address, settings.TCP_STREAMING_PORT))
+            tcp_socket.sendall(join_command.encode("utf-8"))
+        except socket.error as error:
+            logging.warning(os.strerror(error.errno));
+        finally:
+            tcp_socket.close()
