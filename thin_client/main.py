@@ -254,6 +254,7 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     while (is_running):
         if (async_done == False and async_result.ready() == True):
             scale, offset, is_width_smaller, capture_object, async_done = async_result.get()
+            pool.close()
         if (async_done == True):
             image_frame = stream_reader.get_frame(capture_object, scale)
         event = pygame.event.poll()
