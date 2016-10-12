@@ -6,6 +6,7 @@ import logging
 import pygame
 import argparse
 import time
+from multiprocessing.pool import ThreadPool
 from random import randint
 from pygame.locals import *
 from thin_client.session import GameSession
@@ -238,20 +239,27 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     """
     session = GameSession(ip, player_controller_id)
     screen = initialize_pygame(settings.FPS)
-    scale, offset, is_width_smaller, capture_object = stream_reader.setup_stream(ip, port)
+    
+    pool = ThreadPool(processes=1)
+    async_result =  pool.apply_async(stream_reader.setup_stream, (ip, port))
+    async_done = False
+    
     is_running = True
     is_mouse_grabbed = True
     
     counter1 = 0
     counter2 = 0
     counter3 = 0
-
+    
     while (is_running):
-        image_frame = stream_reader.get_frame(capture_object, scale)
+        if (async_done == False and async_result.ready() == True):
+            scale, offset, is_width_smaller, capture_object, async_done = async_result.get()
+        if (async_done == True):
+            image_frame = stream_reader.get_frame(capture_object, scale)
         event = pygame.event.poll()
 
         # If we did not manage to get a frame from the stream
-        if (image_frame == False):
+        if (async_done == True and image_frame == False):
             show_message(screen, settings.TEXT_SERVER_DISCONNECTED, settings.TEXT_RESTART_CLIENT)
             action = Action(session, pygame)
             
@@ -308,10 +316,11 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
             '''
                 
             # Display the frame on the pygame window
-            if (is_width_smaller):
-                screen.blit(image_frame, (0, offset))
-            else:
-                screen.blit(image_frame, (offset, 0))
+            if (async_done == True):
+                if (is_width_smaller):
+                    screen.blit(image_frame, (0, offset))
+                else:
+                    screen.blit(image_frame, (offset, 0))
             pygame.display.flip()
             
         # To toggle mouse grabbing within the window
@@ -320,10 +329,11 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
         elif (event.type == QUIT):
             action = QuitAction(session, pygame)
             is_running = False
-            capture_object.release()
+            if (async_done == True):
+                capture_object.release()
 
         action.process(event)
-
+    
     pygame.quit()
 
 def main(ip, port, player_controller_id, session_id, game_id, username, *args, **kwargs):

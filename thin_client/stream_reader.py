@@ -68,4 +68,4 @@ def setup_stream(ip, port):
     scale, is_width_smaller = get_scale_factor(cap)
     offset = get_offset(scale, is_width_smaller, frame_width, frame_height)
     
-    return (scale, offset, is_width_smaller, cap)
+    return (scale, offset, is_width_smaller, cap, True)
