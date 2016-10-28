@@ -8,28 +8,23 @@ You need:
 
 1. Python 3.5
 2. pygame 1.9.2
-3. numpy 1.8
-4. OpenCV 3.1.0
+3. MPlayer
 
 Ensure that the above dependencies are obtained for Python 3. We use the above mentioned versions during development. Other versions may work, but not guaranteed.
 
 ## Obtaining and installing dependencies (for Windows)
 
 ### Python 3.5
-1. We recommend downloading the Anaconda distribution for Python 3. It is a prepackaged version of Python that sets up all required system environment variables for you, and no configuration is needed (it is a simple `.exe` installer).
-2. You can download Anaconda [here](https://www.continuum.io/downloads). Ensure that you download Python 3.X.
+1. Download the executable installer [here](https://www.python.org/downloads/windows/). Allow it to set up the necessary environment variables for you.
 
 ### pygame
 1. Obtain the .whl file for your Python version [here](http://www.lfd.uci.edu/~gohlke/pythonlibs/#pygame). There are 32-bit and 64-bit files, so make sure you get the version that matches your installation of Python.
 2. Open the terminal, and navigate to where you placed your .whl file. Type `pip install filename.whl`, replacing the filename with the correct one.
 
-### numpy
-1. Open your terminal at the root of the repository directory. 
-2. Type `pip install -r requirements.txt`.
-
-### OpenCV
-1. Obtain the .whl file for your Python version [here](http://www.lfd.uci.edu/~gohlke/pythonlibs/#opencv). There are 32-bit and 64-bit files, so make sure you get the version that matches your installation of Python.
-2. Open the terminal, and navigate to where you placed your .whl file. Type `pip install filename.whl`, replacing the filename with the correct one.
+### MPlayer
+1. Download the release binaries [here](http://mplayerwin.sourceforge.net/downloads.html). 
+2. Unzip the files, place them somewhere where you will not move it.
+3. Add the directory of mplayer.exe into the system environment variables.
 
 ## Launching the client
 To run the thin client itself, you will need to pass in 3 arguments: the IP from which to receive the video stream from, the port number, and the player controller ID. The fourth argument (game session ID) is optional, and will default to 1 if not given.
