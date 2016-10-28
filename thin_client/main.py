@@ -5,14 +5,11 @@ sys.path.append(os.getcwd())
 import logging
 import pygame
 import argparse
-import time
-from multiprocessing.pool import ThreadPool
+import subprocess
 from random import randint
 from pygame.locals import *
 from thin_client.session import GameSession
 from thin_client import settings
-from thin_client import stream_reader
-
 
 class Action:
     def __init__(self, session, pygame):
@@ -239,11 +236,7 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     """
     session = GameSession(ip, player_controller_id)
     screen = initialize_pygame(settings.FPS)
-    
-    pool = ThreadPool(processes=1)
-    async_result =  pool.apply_async(stream_reader.setup_stream, (ip, port))
-    async_done = False
-    
+        
     is_running = True
     is_mouse_grabbed = True
     
@@ -251,90 +244,74 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     counter2 = 0
     counter3 = 0
     
+    cmd = "mplayer -quiet -cache 1000 -vo gl -benchmark -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
+    process = subprocess.Popen(cmd)
+    
     while (is_running):
-        if (async_done == False and async_result.ready() == True):
-            scale, offset, is_width_smaller, capture_object, async_done = async_result.get()
-            pool.close()
-        if (async_done == True):
-            image_frame = stream_reader.get_frame(capture_object, scale)
         event = pygame.event.poll()
-
-        # If we did not manage to get a frame from the stream
-        if (async_done == True and image_frame == False):
-            show_message(screen, settings.TEXT_SERVER_DISCONNECTED, settings.TEXT_RESTART_CLIENT)
-            action = Action(session, pygame)
-            
+        
+        if (player_controller_id == 0):
+            if (counter1 == 100):
+                action = KeyboardButtonSUp(session, pygame)
+                counter1 = 0
+            elif (counter1 < 50):
+                action = KeyboardButtonWDown(session, pygame)
+            elif (counter1 == 50):
+                action = KeyboardButtonWUp(session, pygame)
+            elif (counter1 > 50):
+                action = KeyboardButtonSDown(session, pygame)
+            counter1 += 1
+        elif (player_controller_id == 1):
+            if (counter2 == 100):
+                action = KeyboardButtonDUp(session, pygame)
+                counter2 = 0
+            elif (counter2 < 50):
+                action = KeyboardButtonADown(session, pygame)
+            elif (counter2 == 50):
+                action = KeyboardButtonAUp(session, pygame)
+            elif (counter2 > 50):
+                action = KeyboardButtonDDown(session, pygame)
+            counter2 += 1
+        elif (player_controller_id == 2):
+            action = MouseMotionXLeft(session, pygame)
+        elif (player_controller_id == 3):
+            action = MouseMotionXRight(session, pygame)
+        elif (player_controller_id == 4):
+            if (counter3 == 100):
+                action = KeyboardButtonSUp(session, pygame)
+                counter3 = 0
+            elif (counter3 < 50):
+                action = KeyboardButtonWDown(session, pygame)
+            elif (counter3 == 50):
+                action = KeyboardButtonWUp(session, pygame)
+            elif (counter3 > 50):
+                action = KeyboardButtonSDown(session, pygame)
+            counter3 += 1
+        elif (player_controller_id == 5):
+            action = MouseMotionRandom1(session, pygame)
         else:
-            if (player_controller_id == 0):
-                if (counter1 == 100):
-                    action = KeyboardButtonSUp(session, pygame)
-                    counter1 = 0
-                elif (counter1 < 50):
-                    action = KeyboardButtonWDown(session, pygame)
-                elif (counter1 == 50):
-                    action = KeyboardButtonWUp(session, pygame)
-                elif (counter1 > 50):
-                    action = KeyboardButtonSDown(session, pygame)
-                counter1 += 1
-            elif (player_controller_id == 1):
-                if (counter2 == 100):
-                    action = KeyboardButtonDUp(session, pygame)
-                    counter2 = 0
-                elif (counter2 < 50):
-                    action = KeyboardButtonADown(session, pygame)
-                elif (counter2 == 50):
-                    action = KeyboardButtonAUp(session, pygame)
-                elif (counter2 > 50):
-                    action = KeyboardButtonDDown(session, pygame)
-                counter2 += 1
-            elif (player_controller_id == 2):
-                action = MouseMotionXLeft(session, pygame)
-            elif (player_controller_id == 3):
-                action = MouseMotionXRight(session, pygame)
-            elif (player_controller_id == 4):
-                if (counter3 == 100):
-                    action = KeyboardButtonSUp(session, pygame)
-                    counter3 = 0
-                elif (counter3 < 50):
-                    action = KeyboardButtonWDown(session, pygame)
-                elif (counter3 == 50):
-                    action = KeyboardButtonWUp(session, pygame)
-                elif (counter3 > 50):
-                    action = KeyboardButtonSDown(session, pygame)
-                counter3 += 1
-            elif (player_controller_id == 5):
-                action = MouseMotionRandom1(session, pygame)
-            else:
-                action = MouseMotionRandom(session, pygame)
-
-            '''
-            elif (event.type == KEYDOWN or event.type == KEYUP):
-                action = KeyboardButton(session, pygame)                    
-            elif (event.type == pygame.MOUSEMOTION):
-                action = MouseMotion(session, pygame)
-            elif (event.type == MOUSEBUTTONDOWN or event.type == MOUSEBUTTONUP):
-                action = MouseButton(session, pygame)
-            '''
-                
-            # Display the frame on the pygame window
-            if (async_done == True):
-                if (is_width_smaller):
-                    screen.blit(image_frame, (0, offset))
-                else:
-                    screen.blit(image_frame, (offset, 0))
-            pygame.display.flip()
-            
+            action = MouseMotionRandom(session, pygame)
+    
+        '''
+        if (event.type == KEYDOWN or event.type == KEYUP):
+            action = KeyboardButton(session, pygame)                    
+        elif (event.type == pygame.MOUSEMOTION):
+            action = MouseMotion(session, pygame)
+        elif (event.type == MOUSEBUTTONDOWN or event.type == MOUSEBUTTONUP):
+            action = MouseButton(session, pygame)
+        else:
+            action = Action(session, pygame)
+        '''
+        
         # To toggle mouse grabbing within the window
         if (event.type == KEYUP and event.key == K_ESCAPE):
             is_mouse_grabbed = toggle_mouse_grab(pygame, is_mouse_grabbed)
         elif (event.type == QUIT):
             action = QuitAction(session, pygame)
             is_running = False
-            if (async_done == True):
-                capture_object.release()
-
+        
         action.process(event)
-    
+        
     pygame.quit()
 
 def main(ip, port, player_controller_id, session_id, game_id, username, *args, **kwargs):
@@ -343,7 +320,6 @@ def main(ip, port, player_controller_id, session_id, game_id, username, *args, *
     
     print("Thin client starting with ip {}, port {}, player controller id {}".format(ip, port, player_controller_id))
     
-    time.sleep(5) # Give ffmpeg some time to start up and start streaming
     start_client(ip, port, int(player_controller_id), *args, **kwargs)
 
 if __name__ == '__main__':
