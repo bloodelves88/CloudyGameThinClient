@@ -244,7 +244,8 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     counter2 = 0
     counter3 = 0
     
-    cmd = "mplayer -quiet -cache 1000 -vo gl -benchmark -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
+    # rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
+    cmd = "mplayer -quiet -cache 1000 -vo gl -nosound -benchmark -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
     process = subprocess.Popen(cmd)
     
     while (is_running):
