@@ -165,7 +165,7 @@ def initialize_pygame(fps):
     fps -- the rate pygame will read key events at
     """
     pygame.init()
-    screen = pygame.display.set_mode((settings.RESO_WIDTH, settings.RESO_HEIGHT))
+    screen = pygame.display.set_mode((settings.RESO_WIDTH, settings.RESO_HEIGHT), RESIZABLE|DOUBLEBUF|HWSURFACE)
     pygame.display.set_caption(settings.TEXT_WINDOW_TITLE)
     pygame.mouse.set_visible(False) # Makes mouse invisible
     pygame.event.set_grab(True) # confines the mouse cursor to the window
