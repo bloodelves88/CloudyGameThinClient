@@ -10,6 +10,7 @@ from random import randint
 from pygame.locals import *
 from thin_client.session import GameSession
 from thin_client import settings
+import time
 
 class Action:
     def __init__(self, session, pygame):
@@ -169,7 +170,7 @@ def initialize_pygame(fps):
     pygame.display.set_caption(settings.TEXT_WINDOW_TITLE)
     pygame.mouse.set_visible(False) # Makes mouse invisible
     pygame.event.set_grab(True) # confines the mouse cursor to the window
-    frame_interval = int((1/fps)*1000)
+    frame_interval = int((1.0/fps)*1000.0)
     pygame.key.set_repeat(frame_interval, frame_interval) # 1 input per frame
 
     show_message(screen, settings.TEXT_LOADING, settings.TEXT_PATIENCE)
@@ -226,7 +227,7 @@ def toggle_mouse_grab(pygame, is_mouse_grabbed):
     return is_mouse_grabbed
 
 def start_client(ip, port, player_controller_id, *args, **kwargs):
-    """Main event loop starts here. Calls all methods to initialze the GameSession, video streaming,
+    """Main event loop starts here. Calls all methods to initialize the GameSession, video streaming,
     and pygame.
     
     Keyword arguments:
@@ -245,7 +246,7 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     counter3 = 0
     
     # rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
-    cmd = "mplayer -quiet -cache 1000 -vo gl -nosound -benchmark -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
+    cmd = "mplayer -quiet -vo gl -nosound -benchmark -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
     process = subprocess.Popen(cmd)
     
     while (is_running):
@@ -312,6 +313,7 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
             is_running = False
         
         action.process(event)
+        time.sleep(1.0/settings.FPS)
         
     pygame.quit()
 
@@ -328,10 +330,10 @@ if __name__ == '__main__':
     parser.add_argument('ip', metavar='ip', type=str, default="127.0.0.1",
                         help="IP address to obtain video stream from")
     parser.add_argument('port', metavar='port', type=int, default=30000,
-                        choices=range(30000, 30006),
+                        choices=range(30000, 30012),
                         help="Port of the IP address you are connecting to. Value from 30000 to 30005")
     parser.add_argument('player', metavar='player', type=int, default=0,
-                        choices=range(0, 6),
+                        choices=range(0, 12),
                         help="Player controller ID of the player. Value from 0 to 5.")
     parser.add_argument('--session', metavar='session', type=int, default=1,
                         help="ID of the current game session being used.")
