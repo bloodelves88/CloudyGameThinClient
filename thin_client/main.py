@@ -166,7 +166,7 @@ def initialize_pygame(fps):
     fps -- the rate pygame will read key events at
     """
     pygame.init()
-    screen = pygame.display.set_mode((settings.RESO_WIDTH, settings.RESO_HEIGHT), RESIZABLE|DOUBLEBUF|HWSURFACE)
+    screen = pygame.display.set_mode((settings.RESO_WIDTH, settings.RESO_HEIGHT), RESIZABLE)
     pygame.display.set_caption(settings.TEXT_WINDOW_TITLE)
     pygame.mouse.set_visible(False) # Makes mouse invisible
     pygame.event.set_grab(True) # confines the mouse cursor to the window
@@ -250,7 +250,7 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     process = subprocess.Popen(cmd)
     
     while (is_running):
-        event = pygame.event.poll()
+        event = pygame.event.wait()
         
         if (player_controller_id == 0):
             if (counter1 == 100):
@@ -313,7 +313,6 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
             is_running = False
         
         action.process(event)
-        time.sleep(1.0/settings.FPS)
         
     pygame.quit()
 
