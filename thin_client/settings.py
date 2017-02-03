@@ -9,8 +9,8 @@ H = unsigned short (2 bytes)
 h = signed short (2 bytes)
 """
 # Networking constants
-PACKET_FORMAT_KEY = "=BBIBHHB"
-PACKET_FORMAT_MOUSE = "=BBIBhh"
+PACKET_FORMAT_KEY = "=BBBHHB"
+PACKET_FORMAT_MOUSE = "=BBBhh"
 UDP_PORT = 55555              # Port to RemoteController
 TCP_STREAMING_PORT = 55556    # Port to StreamingPlugin
 TCP_CLOUDYWEBAPI_PORT = 55557 # Port to CloudyWebAPI
