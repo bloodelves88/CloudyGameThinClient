@@ -13,5 +13,5 @@ before_install:
 
 
 # command to run tests
-script:
-  - py.test thin_client/test/test_game_session.py
+#script:
+#  - py.test thin_client/test/test_game_session.py
