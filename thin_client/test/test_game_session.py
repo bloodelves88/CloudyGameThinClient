@@ -10,19 +10,19 @@ class ProtocolTest(unittest.TestCase):
         self.session = GameSession(ip_address, player_controller_id)
 
     
-    def test_pack_and_send_sequence_0_to_1(self):
-        """Check if packAndSend increments the sequence number correctly"""
-
-        # Arrange 
-        device_type, ue_key_code, ue_char_code, event_type = (1, 0, 0, 0)
-        current_sequence = self.session.sequence
-
-        # Act
-        self.session.pack_and_send(device_type, ue_key_code, ue_char_code, event_type)
-
-        # Assert
-        self.assertEqual(self.session.sequence, current_sequence + 1,
-            "pack_and_send did not increment the sequence by 1")
+    #def test_pack_and_send_sequence_0_to_1(self):
+    #    """Check if packAndSend increments the sequence number correctly"""
+    #
+    #    # Arrange 
+    #    device_type, ue_key_code, ue_char_code, event_type = (1, 0, 0, 0)
+    #    current_sequence = self.session.sequence
+    #
+    #    # Act
+    #    self.session.pack_and_send(device_type, ue_key_code, ue_char_code, event_type)
+    #
+    #    # Assert
+    #    self.assertEqual(self.session.sequence, current_sequence + 1,
+    #        "pack_and_send did not increment the sequence by 1")
         
 
 if __name__ == '__main__':
