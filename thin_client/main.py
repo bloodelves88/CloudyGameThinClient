@@ -159,7 +159,7 @@ class QuitAction(Action):
         """Call the send_quit_command method when the user closes the thin client"""
         self.session.send_quit_command()
         
-def initialize_pygame(fps):
+def initialize_pygame(fps, index):
     """Initialize pygame with the window size, mouse settings, etc.
     
     Keyword arguments:
@@ -167,9 +167,9 @@ def initialize_pygame(fps):
     """
     pygame.init()
     screen = pygame.display.set_mode((settings.RESO_WIDTH, settings.RESO_HEIGHT), RESIZABLE)
-    pygame.display.set_caption(settings.TEXT_WINDOW_TITLE)
-    pygame.mouse.set_visible(False) # Makes mouse invisible
-    pygame.event.set_grab(True) # confines the mouse cursor to the window
+    pygame.display.set_caption(str(index))
+    pygame.mouse.set_visible(True) # Makes mouse invisible
+    pygame.event.set_grab(False) # confines the mouse cursor to the window
     frame_interval = int((1.0/fps)*1000.0)
     pygame.key.set_repeat(frame_interval, frame_interval) # 1 input per frame
 
@@ -236,7 +236,7 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     player_controller_id -- The player controller ID of the user using this thin client
     """
     session = GameSession(ip, player_controller_id)
-    screen = initialize_pygame(settings.FPS)
+    screen = initialize_pygame(settings.FPS, player_controller_id)
         
     is_running = True
     is_mouse_grabbed = True
@@ -317,7 +317,7 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
 
 def main(ip, port, player_controller_id, session_id, game_id, username, *args, **kwargs):
     session = GameSession(ip, player_controller_id)
-    session.send_join_command(ip, port, player_controller_id, session_id, game_id, username)
+    #session.send_join_command(ip, port, player_controller_id, session_id, game_id, username)
     
     print("Thin client starting with ip {}, port {}, player controller id {}".format(ip, port, player_controller_id))
     

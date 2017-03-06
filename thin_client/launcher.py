@@ -7,7 +7,7 @@ def main(num_players, ip, *args, **kwargs):
         port = 30000 + x
         command = "python main.py {} {} {}".format(ip, port, x)
         subprocess.Popen(command)
-        time.sleep(6) # Give some time to start up and start streaming
+        time.sleep(2) # Give some time to start up and start streaming
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Launch multiple thin clients with their configurations set up')
