@@ -305,7 +305,7 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
                 action = Action(session, pygame)
             
         # To toggle mouse grabbing within the window
-        if (event.type == KEYUP and event.key == K_ESCAPE):
+        if (event.key == K_ESCAPE and event.type == KEYUP):
             is_mouse_grabbed = toggle_mouse_grab(pygame, is_mouse_grabbed)
         elif (event.type == QUIT):
             #action = QuitAction(session, pygame)
