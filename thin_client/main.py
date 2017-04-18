@@ -112,6 +112,24 @@ class KeyboardButtonAUp(Action):
         ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
         self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
             ue_key_code, ue_char_code, KEYUP)
+            
+class MouseButtonLeftDown(Action):
+    def process(self, event):
+        """Processes keyboard button events and sends it to the pack_and_send method"""
+        ue_key_code = 1
+        ue_char_code = 1
+        ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
+            ue_key_code, ue_char_code, 2)
+            
+class MouseButtonLeftUp(Action):
+    def process(self, event):
+        """Processes keyboard button events and sends it to the pack_and_send method"""
+        ue_key_code = 0
+        ue_char_code = 0
+        ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
+            ue_key_code, ue_char_code, 3)
         
 class MouseButton(Action):
     def process(self, event):
@@ -245,56 +263,21 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     counter2 = 0
     counter3 = 0
     
+    isDown = 0
+    shootStart3 = time.time()
+    turnLeft2 = time.time()
+    
     # rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
     cmd = "mplayer -quiet -vo gl -nosound -benchmark -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
     process = subprocess.Popen(cmd)
     
     while (is_running):
-        #event = pygame.event.wait()
-        event = pygame.event.poll()
-        
+        #event = pygame.event.wait() # Use this if there is no pre-programmed input
+        event = pygame.event.poll() # This is needed if sending pre-programmed input
+        #
         time.sleep(0.0333) # This is needed if sending pre-programmed input
-        
+        #
         if (player_controller_id == 0):
-            if (counter1 == 100):
-                action = KeyboardButtonSUp(session, pygame)
-                counter1 = 0
-            elif (counter1 < 50):
-                action = KeyboardButtonWDown(session, pygame)
-            elif (counter1 == 50):
-                action = KeyboardButtonWUp(session, pygame)
-            elif (counter1 > 50):
-                action = KeyboardButtonSDown(session, pygame)
-            counter1 += 1
-        elif (player_controller_id == 1):
-            if (counter2 == 100):
-                action = KeyboardButtonDUp(session, pygame)
-                counter2 = 0
-            elif (counter2 < 50):
-                action = KeyboardButtonADown(session, pygame)
-            elif (counter2 == 50):
-                action = KeyboardButtonAUp(session, pygame)
-            elif (counter2 > 50):
-                action = KeyboardButtonDDown(session, pygame)
-            counter2 += 1
-        elif (player_controller_id == 2):
-            action = MouseMotionXLeft(session, pygame)
-        elif (player_controller_id == 3):
-            action = MouseMotionXRight(session, pygame)
-        elif (player_controller_id == 4):
-            if (counter3 == 100):
-                action = KeyboardButtonWUp(session, pygame)
-                counter3 = 0
-            elif (counter3 < 50):
-                action = KeyboardButtonSDown(session, pygame)
-            elif (counter3 == 50):
-                action = KeyboardButtonSUp(session, pygame)
-            elif (counter3 > 50):
-                action = KeyboardButtonWDown(session, pygame)
-            counter3 += 1
-        elif (player_controller_id == 5):
-            action = MouseMotionRandom1(session, pygame)
-        else:
             if (event.type == KEYDOWN or event.type == KEYUP):
                 action = KeyboardButton(session, pygame)                    
             elif (event.type == pygame.MOUSEMOTION):
@@ -303,6 +286,38 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
                 action = MouseButton(session, pygame)
             else:
                 action = Action(session, pygame)
+        elif (player_controller_id == 1):
+            action = MouseMotionXLeft(session, pygame)
+        elif (player_controller_id == 2):
+            action = Action(session, pygame)
+            if (time.time() - turnLeft2 > 6):
+                action = MouseMotionXLeft(session, pygame)
+                turnLeft2 = time.time()
+        elif (player_controller_id == 3):
+            action = MouseMotionXRight(session, pygame)
+            if (time.time() - shootStart3 > 5):
+                if (isDown == 0):
+                    action = MouseButtonLeftDown(session, pygame)
+                    isDown = 1 - isDown
+                else:
+                    action = MouseButtonLeftUp(session, pygame)
+                    isDown = 1 - isDown
+                shootStart3 = time.time()
+        #elif (player_controller_id == 4):
+        #    if (counter3 == 100):
+        #        action = KeyboardButtonWUp(session, pygame)
+        #        counter3 = 0
+        #    elif (counter3 < 50):
+        #        action = KeyboardButtonSDown(session, pygame)
+        #    elif (counter3 == 50):
+        #        action = KeyboardButtonSUp(session, pygame)
+        #    elif (counter3 > 50):
+        #        action = KeyboardButtonWDown(session, pygame)
+        #    counter3 += 1
+        #elif (player_controller_id == 5):
+        #    action = MouseMotionRandom1(session, pygame)
+        #else:
+        
             
         # To toggle mouse grabbing within the window
         if (event.key == K_ESCAPE and event.type == KEYUP):
