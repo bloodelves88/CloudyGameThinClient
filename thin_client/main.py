@@ -151,9 +151,15 @@ class MouseButton(Action):
             self.session.pack_and_send(settings.DEVICE_KEYBOARD, 2, 2, 2)
         elif (event.type == MOUSEBUTTONUP and event.button == 3):
             self.session.pack_and_send(settings.DEVICE_KEYBOARD, 2, 2, 3)
+            
+        # Scroll Up
+        elif (event.type == MOUSEBUTTONDOWN and event.button == 4):
+            self.session.pack_and_send(settings.DEVICE_KEYBOARD, 999, 999, 2)   
+        # Scroll Down
+        elif (event.type == MOUSEBUTTONDOWN and event.button == 5):
+            self.session.pack_and_send(settings.DEVICE_KEYBOARD, 998, 998, 2)  
         
-        #logging.info("Mouse button: %s => %s", event.button)
-        print("Mouse button: %s => %s", event.button)
+        logging.info("Mouse button: %s => %s", event.button)
 
 
 class MouseMotion(Action):
