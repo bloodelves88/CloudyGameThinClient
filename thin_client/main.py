@@ -133,24 +133,27 @@ class MouseButtonLeftUp(Action):
         
 class MouseButton(Action):
     def process(self, event):
-        """Processes mouse button events and sends it to the pack_and_send method"""
-        left_mouse_button, middle_mouse_button, right_mouse_button = self.pygame.mouse.get_pressed()
-        if (left_mouse_button == 1):
-            ue_char_code = 1
-        elif (middle_mouse_button == 1):
-            ue_char_code = 4
-        elif (right_mouse_button == 1):
-            ue_char_code = 2
-        else:
-            ue_char_code = 0
-        ue_key_code = ue_char_code
-        if (event.type == MOUSEBUTTONDOWN):
-            self.session.pack_and_send(settings.DEVICE_KEYBOARD,
-                ue_key_code, ue_char_code, 2)
-        elif (event.type == MOUSEBUTTONUP):
-            self.session.pack_and_send(settings.DEVICE_KEYBOARD,
-                ue_key_code, ue_char_code, 3)
-        logging.info("Mouse button: %s => %s", self.pygame.mouse.get_pressed(), ue_key_code)
+        """Processes mouse button events and sends it to the pack_and_send method"""        
+        # Left Mouse Button
+        if (event.type == MOUSEBUTTONDOWN and event.button == 1):
+            self.session.pack_and_send(settings.DEVICE_KEYBOARD, 1, 1, 2)
+        elif (event.type == MOUSEBUTTONUP and event.button == 1):
+            self.session.pack_and_send(settings.DEVICE_KEYBOARD, 1, 1, 3)
+        
+        # Middle Mouse Button
+        elif (event.type == MOUSEBUTTONDOWN and event.button == 2):
+            self.session.pack_and_send(settings.DEVICE_KEYBOARD, 4, 4, 2)
+        elif (event.type == MOUSEBUTTONUP and event.button == 2):
+            self.session.pack_and_send(settings.DEVICE_KEYBOARD, 4, 4, 3)
+            
+        # Right Mouse Button
+        elif (event.type == MOUSEBUTTONDOWN and event.button == 3):
+            self.session.pack_and_send(settings.DEVICE_KEYBOARD, 2, 2, 2)
+        elif (event.type == MOUSEBUTTONUP and event.button == 3):
+            self.session.pack_and_send(settings.DEVICE_KEYBOARD, 2, 2, 3)
+        
+        #logging.info("Mouse button: %s => %s", event.button)
+        print("Mouse button: %s => %s", event.button)
 
 
 class MouseMotion(Action):
