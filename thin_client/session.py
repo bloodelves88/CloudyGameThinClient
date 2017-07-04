@@ -43,7 +43,15 @@ class GameSession(object):
             message = struct.pack(settings.PACKET_FORMAT_KEY, *data_keyboard)
         elif (device_type == settings.DEVICE_MOUSE):
             message = struct.pack(settings.PACKET_FORMAT_MOUSE, *data_mouse)
+        #if (self.player_controller_id == 0):
         self.sock.sendto(message, (self.ip_address, settings.UDP_PORT))
+        # These will not work since the player controller ID should always be 0 on the receiving end
+        #elif (self.player_controller_id == 1):
+        #    self.sock.sendto(message, (self.ip_address, 55565))
+        #elif (self.player_controller_id == 2):
+        #    self.sock.sendto(message, (self.ip_address, 55575))
+        #elif (self.player_controller_id == 3):
+        #    self.sock.sendto(message, (self.ip_address, 55585))
 
     def send_quit_command(self):
         """Sends a quit command to the game engine (CloudyPlayerManager module)"""
