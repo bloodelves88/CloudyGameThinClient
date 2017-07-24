@@ -11,8 +11,8 @@ h = signed short (2 bytes)
 # Networking constants
 PACKET_FORMAT_KEY = "=BBBHHB"
 PACKET_FORMAT_MOUSE = "=BBBhh"
-UDP_PORT = 55555              # Port to RemoteController
-TCP_STREAMING_PORT = 55556    # Port to StreamingPlugin
+UDP_PORT = 55555              # Port to RemoteController plugin
+TCP_STREAMING_PORT = 55556    # Port to CloudyWebConnector plugin
 TCP_CLOUDYWEBAPI_PORT = 55557 # Port to CloudyWebAPI
 VERSION = 0
 
