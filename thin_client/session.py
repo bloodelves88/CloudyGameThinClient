@@ -21,6 +21,8 @@ class GameSession(object):
     8bit ControllerID (start from 0)
     16bit x-axis movement
     16bit y-axis movement
+    16bit x-axis position
+    16bit y-axis movement
     """
 
     def __init__(self, ip_address, player_controller_id):
@@ -31,14 +33,14 @@ class GameSession(object):
         self.player_controller_id = player_controller_id
     
     def pack_and_send(self, device_type, ue_key_code, 
-                      ue_char_code, event_type):
+                      ue_char_code, event_type, pos_x=0, pos_y=0):
         """Packs the keyboard or mouse information into a UDP packet, 
            and sends it to the game (Remote Controller module)
         """
         data_keyboard = (settings.VERSION, device_type, self.player_controller_id,
                          ue_key_code, ue_char_code, event_type)
         data_mouse = (settings.VERSION, device_type, self.player_controller_id, 
-                      ue_key_code, ue_char_code)
+                      ue_key_code, ue_char_code, pos_x, pos_y)
         if (device_type == settings.DEVICE_KEYBOARD):
             message = struct.pack(settings.PACKET_FORMAT_KEY, *data_keyboard)
         elif (device_type == settings.DEVICE_MOUSE):

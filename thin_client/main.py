@@ -165,9 +165,9 @@ class MouseButton(Action):
 class MouseMotion(Action):
     def process(self, event):
         """Processes mouse motion events and sends it to the pack_and_send method"""
-        #x, y = self.pygame.mouse.get_rel()
-        x, y = self.pygame.mouse.get_pos()
-        self.session.pack_and_send(settings.DEVICE_MOUSE, x, y, event.type)
+        x, y = self.pygame.mouse.get_rel()
+        pos_x, pos_y = self.pygame.mouse.get_pos()
+        self.session.pack_and_send(settings.DEVICE_MOUSE, x, y, event.type, pos_x, pos_y)
         logging.info("Mouse motion: %d %d", x, y)
 
 
