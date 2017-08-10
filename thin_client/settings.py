@@ -7,10 +7,11 @@ I = unsigned int (4 bytes)
 i = signed int (4 bytes)
 H = unsigned short (2 bytes)
 h = signed short (2 bytes)
+f = float (4 bytes)
 """
 # Networking constants
 PACKET_FORMAT_KEY = "=BBBHHB"
-PACKET_FORMAT_MOUSE = "=BBBhhhh"
+PACKET_FORMAT_MOUSE = "=BBBhhff"
 UDP_PORT = 55555              # Port to RemoteController plugin
 TCP_STREAMING_PORT = 55556    # Port to CloudyWebConnector plugin
 TCP_CLOUDYWEBAPI_PORT = 55557 # Port to CloudyWebAPI

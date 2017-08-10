@@ -21,8 +21,8 @@ class GameSession(object):
     8bit ControllerID (start from 0)
     16bit x-axis movement
     16bit y-axis movement
-    16bit x-axis position
-    16bit y-axis movement
+    32bit x-axis position
+    32bit y-axis position
     """
 
     def __init__(self, ip_address, player_controller_id):
