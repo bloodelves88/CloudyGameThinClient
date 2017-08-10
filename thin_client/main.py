@@ -6,6 +6,7 @@ import logging
 import pygame
 import argparse
 import subprocess
+import shlex
 from random import randint
 from pygame.locals import *
 from thin_client.session import GameSession
@@ -278,7 +279,11 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     turnLeft2 = time.time()
     
     # rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
+
     cmd = "mplayer -quiet -vo gl -nosound -benchmark -demuxer h264es -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
+    if os.name != 'nt': # non-Windows
+        cmd = shlex.split(cmd)
+
     process = subprocess.Popen(cmd)
     
     while (is_running):
