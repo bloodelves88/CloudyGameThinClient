@@ -165,10 +165,10 @@ class MouseButton(Action):
 
 class MouseMotion(Action):
     def process(self, event):
-        """Processes mouse motion events and sends it to the pack_and_send method"""
+        """Processes mouse motion and position events and sends it to the pack_and_send method"""
         x, y = self.pygame.mouse.get_rel()
         pos_x, pos_y = self.pygame.mouse.get_pos()
-        w, h = pygame.display.get_surface().get_size()
+        w, h = self.pygame.display.get_surface().get_size()
         pos_x = float(pos_x)/w
         pos_y = float(pos_y)/h
         self.session.pack_and_send(settings.DEVICE_MOUSE, x, y, event.type, pos_x, pos_y)
@@ -190,7 +190,12 @@ class QuitAction(Action):
     def process(self, event):
         """Call the send_quit_command method when the user closes the thin client"""
         self.session.send_quit_command()
-        
+
+def updateScreen(event):
+    """ Updates the screen size whenever resized, maintaining aspect ratio """
+    aspect_ratio = settings.RESO_WIDTH/settings.RESO_HEIGHT
+    return pygame.display.set_mode((event.w, int(event.w/aspect_ratio)), RESIZABLE)
+
 def initialize_pygame(fps, index):
     """Initialize pygame with the window size, mouse settings, etc.
     
@@ -340,6 +345,8 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
         # To toggle mouse grabbing within the window
         if (event.type == KEYUP and (event.key == K_LALT or event.key == K_RALT)):
             is_mouse_grabbed = toggle_mouse_grab(pygame, is_mouse_grabbed)
+        elif (event.type == VIDEORESIZE):
+            screen = updateScreen(event)
         elif (event.type == QUIT):
             action = QuitAction(session, pygame)
             is_running = False
