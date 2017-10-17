@@ -288,7 +288,7 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     
     # rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
 
-    cmd = "mplayer -quiet -vo gl -nosound -benchmark -demuxer h264es -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
+    cmd = "mplayer -vo gl -nosound -benchmark -demuxer h264es -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
     if os.name != 'nt': # non-Windows
         cmd = shlex.split(cmd)
 

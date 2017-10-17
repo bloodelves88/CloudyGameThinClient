@@ -84,9 +84,12 @@ class GameSession(object):
         join_command = json.dumps(json_data)
         try:
             tcp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            tcp_socket.settimeout(10.0)
             tcp_socket.connect((self.ip_address, settings.TCP_STREAMING_PORT))
             tcp_socket.sendall(join_command.encode("utf-8"))
+            tcp_socket.settimeout(None)
         except socket.error as error:
-            logging.warning(os.strerror(error.errno));
+            #logging.warning(os.strerror(error.errno));
+            print(error)
         finally:
             tcp_socket.close()
