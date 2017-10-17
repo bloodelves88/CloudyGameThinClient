@@ -186,6 +186,17 @@ class KeyboardButton(Action):
 
         logging.info("Keyboard: %s => %s", event.key, ue_key_code)
 
+class KeyMotion(Action):
+    def process(self, event):
+        ''' For auto motion '''
+        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(K_w, 0)
+        ue_char_code = settings.ASCII_TO_UE_KEYCODE.get(K_w, ue_key_code)
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, ue_key_code, ue_char_code, KEYDOWN)
+
+        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(K_d, 0)
+        ue_char_code = settings.ASCII_TO_UE_KEYCODE.get(K_d, ue_key_code)
+        self.session.pack_and_send(settings.DEVICE_KEYBOARD, ue_key_code, ue_char_code, KEYDOWN)
+
 class QuitAction(Action):
     def process(self, event):
         """Call the send_quit_command method when the user closes the thin client"""
@@ -294,11 +305,18 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
 
     process = subprocess.Popen(cmd)
     
+    isAuto = False
     while (is_running):
         # Controllable thin clients
         event = pygame.event.poll() # Use this if there is no pre-programmed input
         
-        if (event.type == KEYDOWN or event.type == KEYUP):
+        if (event.type == KEYUP and event.key == K_t): # for testing
+            isAuto = not isAuto
+        if isAuto:
+            action = KeyMotion(session, pygame)
+            time.sleep(1.0)
+
+        elif (event.type == KEYDOWN or event.type == KEYUP):
             action = KeyboardButton(session, pygame)                    
         elif (event.type == pygame.MOUSEMOTION):
             action = MouseMotion(session, pygame)
