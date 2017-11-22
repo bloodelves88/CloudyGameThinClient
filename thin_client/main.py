@@ -178,8 +178,21 @@ class MouseMotion(Action):
 class KeyboardButton(Action):
     def process(self, event):
         """Processes keyboard button events and sends it to the pack_and_send method"""
-        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(event.key, 0)
-        ue_char_code = settings.ASCII_TO_UE_CHARCODE.get(event.key, ue_key_code)
+
+        # addition for mobile - map arrows to W,A,S,D keys
+        game_key = event.key
+
+        if (event.key == K_UP):
+            game_key = K_w
+        elif (event.key == K_DOWN):
+            game_key = K_s
+        elif (event.key == K_LEFT):
+            game_key = K_a
+        elif (event.key == K_RIGHT):
+            game_key = K_d
+
+        ue_key_code = settings.ASCII_TO_UE_KEYCODE.get(game_key), 0)
+        ue_char_code = settings.ASCII_TO_UE_CHARCODE.get(game_key, ue_key_code)
         ue_key_code = ue_char_code or ue_key_code # This code is redundant. It changes nothing.
         self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
             ue_key_code, ue_char_code, event.type)
@@ -288,7 +301,7 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     
     # rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
 
-    cmd = "mplayer -quiet -vo gl -nosound -benchmark -demuxer h264es -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
+    cmd = "mplayer -quiet -vo sdl -nosound -benchmark -demuxer h264es -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
     if os.name != 'nt': # non-Windows
         cmd = shlex.split(cmd)
 
