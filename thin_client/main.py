@@ -171,7 +171,9 @@ class MouseMotion(Action):
         w, h = self.pygame.display.get_surface().get_size()
         pos_x = float(pos_x)/w
         pos_y = float(pos_y)/h
-        self.session.pack_and_send(settings.DEVICE_MOUSE, x, y, event.type, pos_x, pos_y)
+
+        # modification for mobile - reverse mouse motion direction
+        self.session.pack_and_send(settings.DEVICE_MOUSE, -x, -y, event.type, pos_x, pos_y)
         logging.info("Mouse motion: %d %d", x, y)
 
 
