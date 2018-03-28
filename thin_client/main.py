@@ -296,7 +296,7 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     
     while (is_running):
         # Controllable thin clients
-        event = pygame.event.poll() # Use this if there is no pre-programmed input
+        event = pygame.event.wait() # Use this if there is no pre-programmed input
         
         if (event.type == KEYDOWN or event.type == KEYUP):
             action = KeyboardButton(session, pygame)                    
