@@ -1,16 +1,23 @@
-import sys
+#import sys
 import os
-sys.path.append(os.path.dirname(os.getcwd()))
-sys.path.append(os.getcwd())
-import logging
+#sys.path.append(os.path.dirname(os.getcwd()))
+#sys.path.append(os.getcwd())
+#import logging
+try:
+    import pygame_sdl2
+    pygame_sdl2.import_as_pygame()
+except ImportError:
+    pass
 import pygame
 import argparse
 import subprocess
 import shlex
 from random import randint
 from pygame.locals import *
-from thin_client.session import GameSession
-from thin_client import settings
+#from thin_client.session import GameSession
+from session import GameSession
+#from thin_client import settings
+import settings
 import time
 
 class Action:
@@ -160,7 +167,7 @@ class MouseButton(Action):
         elif (event.type == MOUSEBUTTONDOWN and event.button == 5):
             self.session.pack_and_send(settings.DEVICE_KEYBOARD, 998, 998, 2)  
         
-        logging.info("Mouse button: %s => %s", event.button)
+#logging.info("Mouse button: %s => %s", event.button)
 
 
 class MouseMotion(Action):
@@ -173,8 +180,27 @@ class MouseMotion(Action):
         pos_y = float(pos_y)/h
 
         # modification for mobile - reverse mouse motion direction
-        self.session.pack_and_send(settings.DEVICE_MOUSE, -x, -y, event.type, pos_x, pos_y)
-        logging.info("Mouse motion: %d %d", x, y)
+        self.session.pack_and_send(settings.DEVICE_MOUSE, x, y, event.type, pos_x, pos_y)
+#logging.info("Mouse motion: %d %d", x, y)
+
+    
+class Accelerometer(Action):
+    def __init__(self, session, pygame):
+        Action.__init__(self, session, pygame)
+        for i in range(self.pygame.joystick.get_count()):
+            joy = pygame.joystick.Joystick(i)
+            joy.init()
+            if joy.get_name() == 'Android Accelerometer':
+                self.accel = joy
+                break
+        self.accel.init()
+
+    def process(self, event):
+        """Moves mouse position according to accelerometer values"""
+        x = self.accel.get_axis(0)
+        y = self.accel.get_axis(1)
+        w, h = self.pygame.display.get_surface().get_size()
+        self.pygame.mouse.set_pos([w*(1-x)*0.5, h*(1-y)*0.5])
 
 
 class KeyboardButton(Action):
@@ -199,7 +225,7 @@ class KeyboardButton(Action):
         self.session.pack_and_send(settings.DEVICE_KEYBOARD, 
             ue_key_code, ue_char_code, event.type)
 
-        logging.info("Keyboard: %s => %s", event.key, ue_key_code)
+#logging.info("Keyboard: %s => %s", event.key, ue_key_code)
 
 class QuitAction(Action):
     def process(self, event):
@@ -225,6 +251,15 @@ def initialize_pygame(fps, index):
     frame_interval = int((1.0/fps)*1000.0)
     pygame.key.set_repeat(frame_interval, frame_interval) # 1 input per frame
 
+    # SP Edit: Added joystick (Android accelerometer)
+    pygame.joystick.init()
+    for i in range(pygame.joystick.get_count()):
+        joy = pygame.joystick.Joystick(i)
+        joy.init()
+        if joy.get_name() == 'Android Accelerometer':
+            accel_i = i
+    pygame.joystick.Joystick(accel_i).init()
+
     show_message(screen, settings.TEXT_LOADING, settings.TEXT_PATIENCE)
 
     return screen
@@ -241,8 +276,8 @@ def show_message(screen, line1, line2, line3=settings.TEXT_INSTRUCTIONS):
     """
     
     screen.fill(settings.SCREEN_BACKGROUND_COLOR)
-    main_font = pygame.font.Font(None, settings.TEXT_MAIN_FONT_SIZE)
-    small_font = pygame.font.Font(None, settings.TEXT_SMALL_FONT_SIZE)
+    main_font = pygame.font.Font('DejaVuSans.ttf', settings.TEXT_MAIN_FONT_SIZE)
+    small_font = pygame.font.Font('DejaVuSans.ttf', settings.TEXT_SMALL_FONT_SIZE)
     line1_message = main_font.render(line1, True, settings.TEXT_COLOUR)
     line2_message = main_font.render(line2, True, settings.TEXT_COLOUR)
     line3_message = small_font.render(line3, True, settings.TEXT_COLOUR)
@@ -302,26 +337,28 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
     turnLeft2 = time.time()
     
     # rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
+# SP Edit: remove vid for testing first
+#cmd = "mplayer -quiet -vo sdl -nosound -benchmark -demuxer h264es -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
+#    cmd = "mplayer -quiet -vo sdl -nosound -benchmark -demuxer h264es -wid {} http://{}:{}".format(0, ip, port)
+#    if os.name != 'nt': # non-Windows
+#        cmd = shlex.split(cmd)
 
-    cmd = "mplayer -quiet -vo sdl -nosound -benchmark -demuxer h264es -wid {} http://{}:{}".format(pygame.display.get_wm_info()['window'], ip, port)
-    if os.name != 'nt': # non-Windows
-        cmd = shlex.split(cmd)
+#    process = subprocess.Popen(cmd, shell=True)
 
-    process = subprocess.Popen(cmd)
-    
     while (is_running):
         # Controllable thin clients
         event = pygame.event.poll() # Use this if there is no pre-programmed input
-        
         if (event.type == KEYDOWN or event.type == KEYUP):
             action = KeyboardButton(session, pygame)                    
         elif (event.type == pygame.MOUSEMOTION):
             action = MouseMotion(session, pygame)
         elif (event.type == MOUSEBUTTONDOWN or event.type == MOUSEBUTTONUP):
             action = MouseButton(session, pygame)
+        elif (event.type == JOYAXISMOTION or event.type == JOYBALLMOTION or event.type == JOYHATMOTION):
+            action = Accelerometer(session, pygame)
         else:
             action = Action(session, pygame)
-            
+        
         #event = pygame.event.poll() # This is needed if sending pre-programmed input
         #
         #if (player_controller_id == 0):
@@ -365,9 +402,9 @@ def start_client(ip, port, player_controller_id, *args, **kwargs):
         elif (event.type == QUIT):
             action = QuitAction(session, pygame)
             is_running = False
-        
+            
         action.process(event)
-        
+
     pygame.quit()
 
 def main(ip, port, player_controller_id, session_id, game_id, username, *args, **kwargs):
@@ -395,5 +432,7 @@ if __name__ == '__main__':
     parser.add_argument('--username', metavar='username', type=str, default="dummy",
                         help="Username of the player playing.")
 
-    args = parser.parse_args()
-    main(args.ip, args.port, args.player, args.session, args.gameid, args.username)
+    # SP Edit: added defaults for testing
+    main('magam002.d2.comp.nus.edu.sg', 30000, 0, 1, 1, 'dummy')
+#    args = parser.parse_args()
+#    main(args.ip, args.port, args.player, args.session, args.gameid, args.username)
