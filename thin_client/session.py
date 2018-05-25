@@ -3,7 +3,7 @@ import struct
 import socket
 import logging
 import json
-import settings
+from thin_client import settings
 
 class GameSession(object):
     """
